@@ -1,37 +1,38 @@
-const dotenv = require("dotenv")
+const dotenv = require('dotenv')
 dotenv.config()
 
-const path = require("path")
-const HtmWebpackPlugin = require("html-webpack-plugin")
-const webpack = require("webpack")
+const path = require('path')
+const HtmlWebpackPlugin = require('html-webpack-plugin')
+const webpack = require('webpack')
 
 module.exports = {
-  entry: "./src/index.ts",
+  entry: './src/index.ts',
   output: {
-    path: path.resolve(__dirname, "dist"),
-    filename: "[name].js",
+    path: path.resolve(__dirname, 'dist'),
+    filename: "[name].js"
   },
   resolve: {
-    extensions: [".js", ".ts", ".json"],
+    extensions: ['.ts', '.js', "json"]
+
   },
-  mode: "development",
+  mode: 'development',
   module: {
     rules: [
       {
         test: /\.ts$/,
-        loader: "ts-loader",
-        exclude: /node_modules/,
+        use: 'ts-loader',
+        exclude: /node_modules/
       },
       {
-        test: /\.css$/i,
-        use: ["style-loader", "css-loader"]
+        test: /\.css$/,
+        use: ['style-loader', 'css-loader']
       }
     ]
   },
   plugins: [
-    new HtmWebpackPlugin({
-      template: "./src/index.html",
-      inject: "body",
+    new HtmlWebpackPlugin({
+      template: './src/index.html',
+      inject: 'body'
     }),
     new webpack.DefinePlugin({
       'process.env.CONTRACT_ADDRESS': JSON.stringify(process.env.CONTRACT_ADDRESS),
@@ -41,6 +42,6 @@ module.exports = {
   devServer: {
     historyApiFallback: true,
     port: 8080,
-    hot: true,
+    hot: true
   }
 }

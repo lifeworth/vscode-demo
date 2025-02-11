@@ -3,7 +3,7 @@ import { concat } from "ethers";
 import { ethers } from "hardhat";
 
 async function deploy(): Promise<any> {
-    const factory = await ethers.getContractFactory("Counter");
+    const factory = await ethers.getContractFactory("Verify");
     const contract = await factory.deploy();
     const instance = await contract.waitForDeployment();
     const address = await instance.getAddress();
@@ -11,13 +11,13 @@ async function deploy(): Promise<any> {
     return instance;
 }
 
-async function increment(targetContract: any) {
-    console.log(await targetContract.increment());
+async function verify(targetContract: any) {
+    console.log(await targetContract.verify());
 }
 
 
 deploy().then((instance) => {
-    increment(instance);
+    verify(instance);
 }).catch((error: Error) => {
     console.error("error",error);
 }).finally((

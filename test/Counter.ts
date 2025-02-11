@@ -1,13 +1,12 @@
-import "@nomicfoundation/hardhat-ethers";
 import { expect } from "chai";
-import { ethers } from "hardhat";
+import {ethers} from "hardhat";
 
-describe("counter", function () {
-  it("should add", async function () {
+describe("sya Hello", function () {
+  it("should return the right string", async function () {
     const Counter = await ethers.getContractFactory("Counter");
     const counter = await Counter.deploy();
     await counter.waitForDeployment();
+    expect(await counter.increment()).to.equal("dudu");
+  });
 
-    expect(await counter.count()).to.equal(1);
-  })
 });

@@ -1,57 +1,68 @@
-import { ethers } from "ethers";
-import { abi } from "../artifacts/contracts/Counter.sol/Counter.json";
+import { ethers } from 'ethers';
+import {abi} from '../artifacts/contracts/Counter.sol/Counter.json';
+// import {abi} from '../artifacts/contracts/HelloWorld.sol/HelloWorld.json';
 
-function getEth() {
-  // @ts-ignore
-  const eth = window.ethereum;
-  if (!eth) {
-    throw new Error("No ethereum provider found");
-  }
-  return eth;
+
+declare global {
+    interface Window {
+        ethereum: any;
+    }
 }
 
-async function requestAccsee(): Promise<boolean> {
-  const eth = getEth();
-  // @ts-ignore
-  const result = (await window.ethereum.request({ method: "eth_requestAccounts" })) as string[];
-  return result && result.length > 0;
+
+function getEthereum(): any {
+    const ethereum = window.ethereum;
+    if (!ethereum) {
+        throw new Error('No ethereum object found');
+    }
+    return ethereum;
+}
+
+async function requestAccess() {
+    const eth = getEthereum();
+    const result = await eth.request({ method: 'eth_requestAccounts' }) as string[];
+    return result && result.length > 0;
+}
+
+
+async function hasSigner() {
+    const eth = getEthereum();
+    const result = await eth.request({ method: 'eth_accounts' }) as string[];
+    return result.length;
 }
 
 async function getContract() {
-  // @ts-ignore
-  if (!(await hasSigner()) && !(await requestAccsee())) {
-    console.log("Have something get into trouble");
-  }
-  // @ts-ignore
-  const provider = new ethers.BrowserProvider(window.ethereum);
-  const contract = new ethers.Contract(
-    process.env.CONTRACT_ADDRESS,
-    // [
-    //   "function getCount() public view returns (uint256)",
-    //   "function count() public",
-    // ],
-    abi,
-    await provider.getSigner());
+    if (!await hasSigner() && !await requestAccess()) {
+        throw new Error('No access to ethereum account');
+    }
+    const provider = new ethers.BrowserProvider(getEthereum());
+    const contract = new ethers.Contract(
+        process.env.CONTRACT_ADDRESS,
+        abi,
+        await provider.getSigner()
+    );
+    contract.on(contract.filters.countChanged(), ({args}) => {
+        document.getElementById('msg').innerText =args[0]+args[1];
+    });
 
-  return contract;
-
+    return contract;
 }
 
-async function init() {
-  const contract = await getContract();
-  document.getElementById("output").innerText = (0).toString();
-  contract.on(contract.filters.CounterInc(), async function ({ args }) {
-    document.getElementById("output").innerText = (args[0] | await contract.getCount()).toString();
-  });
-  document.getElementById("btn").onclick = async () => await contract.count();
+function init() {
+    document.getElementById('btn').onclick = handleClick;
 }
 
-async function hasSigner(): Promise<boolean> {
-  // @ts-ignore
-  const metamask = window.ethereum;
-  const signers = await (metamask.request({ method: "eth_accounts" }) as Promise<string[]>);
-  return signers.length > 0;
+async function callContractHello() {
+    const contract = await getContract();
+    await contract.increment();
 }
 
+
+
+
+
+function handleClick(this: GlobalEventHandlers, ev: MouseEvent) {
+    callContractHello()
+}
 
 init();
