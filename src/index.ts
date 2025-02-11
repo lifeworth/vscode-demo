@@ -1,5 +1,5 @@
 import { ethers } from 'ethers';
-import {abi} from '../artifacts/contracts/Counter.sol/Counter.json';
+import { abi } from '../artifacts/contracts/Counter.sol/Counter.json';
 // import {abi} from '../artifacts/contracts/HelloWorld.sol/HelloWorld.json';
 
 
@@ -41,8 +41,8 @@ async function getContract() {
         abi,
         await provider.getSigner()
     );
-    contract.on(contract.filters.countChanged(), ({args}) => {
-        document.getElementById('msg').innerText =args[0]+args[1];
+    contract.on(contract.filters.countChanged(), ({ args }) => {
+        document.getElementById('msg').innerText = args[0] + args[1];
     });
 
     return contract;
